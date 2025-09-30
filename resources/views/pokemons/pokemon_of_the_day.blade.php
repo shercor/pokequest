@@ -4,8 +4,8 @@
 <div class="container">
     <h1 class="mb-4">Pokémon del Día</h1>
 
-    {{-- Mostrar el Pokémon aleatorio --}}
-    <div class="mb-4 p-2 shadow-sm  d-flex align-items-center gap-5 justify-content-around" style="width:">
+    <!-- Mostrar el Pokémon aleatorio -->
+    <div class="mb-4 p-2 shadow-sm  d-flex align-items-center gap-5 justify-content-around border rounded" style="width:">
         <div class="mr-4" style="text-align: center;">
             <h3 class="card-title">🌟 {{ ucfirst($pokemon->name) }}</h3>
             @if ($pokemon->sprite)
@@ -28,17 +28,28 @@
 
     {{-- Input con datalist --}}
     <form method="GET" action="{{ route('pokemons.show') }}">
-        <div class="mb-4">
-            <label for="pokemon-name" class="form-label mx-auto">🔍 Escribe el nombre de un Pokémon:</label>
-            <div class="autocomplete-container d-flex justify-content-center" style="position: relative;">
+        <div class="mb-4 d-flex justify-content-start">
+            <label for="pokemon-name" class="form-label mb-0" style="font-size:24px;">🔍 Escribe el nombre de un Pokémon:</label>
+            <div class="autocomplete-container d-flex justify-content-center mx-3" style="position: relative; width: 400px;">
                 <input type="text" id="pokemon-search" class="form-control" placeholder="Buscar Pokémon..." style="border-radius: 21px; max-width: 500px !important;">
                 <ul id="autocomplete-results" class="autocomplete-list"></ul>
             </div>
 
         </div>
     </form>
+    
 
-    <div id="pokemon-list-container" class="mb-4">
+    <!-- Encabezado tabla -->
+    <div id="pokemon-list-container" class="mb-4" style="display: none;">
+        <div id="pokemon-list-header" class="pokemon-label-row table-header d-flex justify-content-around align-items-center mb-3">
+            <div class="text-center">Pokémon</div>
+            <div class="text-center">Peso</div>
+            <div class="text-center">Altura</div>
+            <div class="text-center">Tipo primario</div>
+            <div class="text-center">Tipo secundario</div>
+            <div class="text-center">Región</div>
+            <div class="text-center">Color</div>
+        </div>
     </div>
 
     <!-- Modal de Pokémon adivinado -->
@@ -69,6 +80,9 @@
 </div>
 
 <style>
+.table-header div{
+    border-bottom: solid black 2px;
+}
 .autocomplete-list {
     position: absolute;
     top: 100%;
@@ -92,7 +106,6 @@
     padding: 8px 12px;
     cursor: pointer;
     border-bottom: 1px solid #eee;
-    font-family: 'Press Start 2P', sans-serif; /* Si usas esa fuente */
 }
 
 .autocomplete-list li img {
@@ -109,19 +122,120 @@
 }
 
 .pokemon-row > div{
-    font-family: 'Press Start 2P', sans-serif;
-    font-size: 14px;
+    font-size: 22px;
     color: #333;
     text-align: center;
-    width: 125px;
+    width: 150px;
     height: 125px;
     border: solid black 2px;
-    border-radius: 16px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
 
 }
+.pokemon-label-row > div{
+    font-size: 22px;
+    color: #333;
+    text-align: center;
+    width: 150px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.bug {
+    background: #92BC2C;
+    box-shadow: 0 0 20px #92BC2C;
+}
+
+.dark {
+    background: #595761;
+    box-shadow: 0 0 20px #595761;
+}
+
+.dragon {
+    background: #0C69C8;
+    box-shadow: 0 0 20px #0C69C8;
+}
+
+.electric {
+    background: #F2D94E;
+    box-shadow: 0 0 20px #F2D94E;
+}
+
+.fire {
+    background: #FBA54C;
+    box-shadow: 0 0 20px #FBA54C;
+}
+
+.fairy {
+    background: #EE90E6;
+    box-shadow: 0 0 20px #EE90E6;
+}
+
+.fighting {
+    background: #D3425F;
+    box-shadow: 0 0 20px #D3425F;
+}
+
+.flying {
+    background: #A1BBEC;
+    box-shadow: 0 0 20px #A1BBEC;
+}
+
+.ghost {
+    background: #5F6DBC;
+    box-shadow: 0 0 20px #5F6DBC;
+}
+
+.grass {
+    background: #5FBD58;
+    box-shadow: 0 0 20px #5FBD58;
+}
+
+.ground {
+    background: #DA7C4D;
+    box-shadow: 0 0 20px #DA7C4D;
+}
+
+.ice {
+    background: #75D0C1;
+    box-shadow: 0 0 20px #75D0C1;
+}
+
+.normal {
+    background: #A0A29F;
+    box-shadow: 0 0 20px #A0A29F;
+}
+
+.poison {
+    background: #B763CF;
+    box-shadow: 0 0 20px #B763CF;
+}
+
+.psychic {
+    background: #FA8581;
+    box-shadow: 0 0 20px #FA8581;
+}
+
+.rock {
+    background: #C9BB8A;
+    box-shadow: 0 0 20px #C9BB8A;
+}
+
+.steel {
+    background: #5695A3;
+    box-shadow: 0 0 20px #5695A3;
+}
+
+.water {
+    background: #539DDF;
+    box-shadow: 0 0 20px #539DDF;
+}
+
 </style>
 
 <script>
@@ -130,6 +244,9 @@
     const input = document.getElementById('pokemon-search');
     const results = document.getElementById('autocomplete-results');
     const pokemonListContainer = document.getElementById('pokemon-list-container');
+
+    const assetBase = "{{ asset('types') }}";
+
 
     const listaTiposPokemonEspanol = {
         normal: 'Normal',
@@ -201,7 +318,7 @@
                 input.value = ''
 
                 const newLi = document.createElement('div');
-                newLi.className = "pokemon-row mb-3 p-4 d-flex justify-content-between align-items-center";
+                newLi.className = "pokemon-row mb-1 py-2 d-flex justify-content-around align-items-center";
 
                 // Función para crear un div invisible
                 const crearDivInvisible = (contenido, tipo) => {
@@ -211,6 +328,7 @@
                     div.style.opacity = '0';
                     div.style.visibility = 'hidden';
                     div.style.transition = 'opacity 0.5s ease';
+                    // div.innerHTML = '<img src="{{ asset('types/normal.svg') }}" alt="Normal Type" style="max-width: 100%; max-height: 100%;">';
                     if (pokemon_data[tipo] == contenido){
                         console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
                         div.style.backgroundColor = clue_colors.success;
@@ -218,12 +336,36 @@
                         console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
                         div.style.backgroundColor = clue_colors.error;
                     }
+
+                    if(tipo == 'primary_type' || tipo == 'secondary_type'){
+                        // const img = document.createElement('img');
+                        // // pasar a minúsculas y quitar acentos
+                        // let tipo_sin_acentos = contenido.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                        // if (tipo_sin_acentos == 'ninguno'){
+                        //     tipo_sin_acentos = 'normal';
+                        // }
+                        // img.src = `/types/${tipo_sin_acentos}.svg`;
+                        // img.alt = `${contenido} Type`;
+                        // img.style.maxWidth = '100%';
+                        // img.style.maxHeight = '100%';
+                        // div.innerHTML = '';
+                        // div.appendChild(img);
+                        var clave = Object.keys(listaTiposPokemonEspanol).find(
+                            key => listaTiposPokemonEspanol[key] === contenido
+                        );
+                        console.log('El tipo EEEES:', contenido);
+                        div.innerHTML = `<img src="${assetBase}/${clave}.svg" alt="Tipo ${clave}" class="${clave}" style="max-width: 66%; max-height: 66%; padding: 15px; border-radius: 50%;">`;
+
+                    }
                     return div;
                 };
 
                 // Imagen + nombre
                 const nameDiv = document.createElement('div');
                 nameDiv.style.display = 'block';
+                nameDiv.style.backgroundColor = 'white';
+                nameDiv.style.overflow = 'hidden';
+                nameDiv.style.fontSize = '18px';
 
                 const img = document.createElement('img');
                 img.src = p.sprite;
@@ -231,6 +373,8 @@
 
                 const name = document.createElement('div');
                 name.textContent = capitalize(p.name);
+                name.style.backgroundColor = 'black';
+                name.style.color = 'white';
 
                 nameDiv.appendChild(img);
                 nameDiv.appendChild(name);
@@ -250,6 +394,9 @@
 
                 divs.forEach(div => newLi.appendChild(div));
                 pokemonListContainer.appendChild(newLi);
+
+                // cambiar display de pokemonListContainer a block
+                pokemonListContainer.style.display = 'block';
 
                 // Mostrar uno por uno cada 1 segundo
                 const esperar = ms => new Promise(resolve => setTimeout(resolve, ms));
