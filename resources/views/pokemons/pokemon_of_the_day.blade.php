@@ -236,6 +236,12 @@
     box-shadow: 0 0 20px #539DDF;
 }
 
+img.disabled {
+  filter: grayscale(100%); /* blanco y negro */
+  opacity: 0.5;            /* más apagada */
+  pointer-events: none;    /* no se puede clickear */
+}
+
 </style>
 
 <script>
@@ -246,6 +252,7 @@
     const pokemonListContainer = document.getElementById('pokemon-list-container');
 
     const assetBase = "{{ asset('types') }}";
+    const assetRegionBase = "{{ asset('regions') }}";
 
 
     const listaTiposPokemonEspanol = {
@@ -338,24 +345,29 @@
                     }
 
                     if(tipo == 'primary_type' || tipo == 'secondary_type'){
-                        // const img = document.createElement('img');
-                        // // pasar a minúsculas y quitar acentos
-                        // let tipo_sin_acentos = contenido.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                        // if (tipo_sin_acentos == 'ninguno'){
-                        //     tipo_sin_acentos = 'normal';
-                        // }
-                        // img.src = `/types/${tipo_sin_acentos}.svg`;
-                        // img.alt = `${contenido} Type`;
-                        // img.style.maxWidth = '100%';
-                        // img.style.maxHeight = '100%';
-                        // div.innerHTML = '';
-                        // div.appendChild(img);
                         var clave = Object.keys(listaTiposPokemonEspanol).find(
                             key => listaTiposPokemonEspanol[key] === contenido
                         );
                         console.log('El tipo EEEES:', contenido);
-                        div.innerHTML = `<img src="${assetBase}/${clave}.svg" alt="Tipo ${clave}" class="${clave}" style="max-width: 66%; max-height: 66%; padding: 15px; border-radius: 50%;">`;
+                        div.style.overflow = 'hidden';
+                        div.style.display = 'flex';
+                        div.style.flexDirection = 'column';
+                        div.innerHTML = `
+                            <img src="${assetBase}/${clave}.svg" alt="Tipo ${clave}" class="${clave} my-auto" style="max-width: 66%; max-height: 66%; padding: 15px; border-radius: 50%;">
+                            <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; ">${contenido}</div>
+                        `;
 
+                    }
+
+                    if (tipo == 'region'){
+                    div.style.overflow = 'hidden';
+                        div.style.display = 'flex';
+                        div.style.flexDirection = 'column';
+                        div.innerHTML = `
+                            <img src="${assetRegionBase}/${contenido}.jpg" alt="Tipo ${clave}" class="${clave} my-auto" style="max-width: 100%; max-height: 100%;">
+                            <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; ">${contenido}</div>
+                        `;
+                        // div.style.lineHeight = '1.5';
                     }
                     return div;
                 };
