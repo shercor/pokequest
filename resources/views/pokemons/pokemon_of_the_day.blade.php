@@ -451,7 +451,7 @@ div.disabled{
                 console.log('Se entró al div:', contenido);
                 boxDiv.innerHTML = `
                 <img src="${assetBase}/${clave}.svg" alt="Tipo ${clave}" class="${clave} my-auto" style="max-width: 66%; max-height: 66%; padding: 15px; border-radius: 50%;">
-                <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; ">${contenido}</div>
+                <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; height: 21% !important;">${contenido}</div>
             `;
             }
             
@@ -463,8 +463,8 @@ div.disabled{
             boxDiv.style.display = 'flex';
             boxDiv.style.flexDirection = 'column';
             boxDiv.innerHTML = `
-                <img src="${assetRegionBase}/${contenido}.jpg" alt="Tipo ${clave}" class="${clave} my-auto" style="max-width: 100%; max-height: 100%;">
-                <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; ">${contenido}</div>
+                <img src="${assetRegionBase}/${contenido}.jpg" alt="Tipo ${clave}" class="${clave} my-auto" style="width: 100%; height: 79% !important;">
+                <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; height: 21% !important;">${contenido}</div>
             `;
         }
         return boxDiv;
