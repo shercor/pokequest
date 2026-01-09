@@ -15,12 +15,12 @@
         </div>
 
         <ul class="mt-3 list-unstyled row">
-            <li class="col-6 d-flex gap-2" ><strong>Altura:</strong> <div id="pokemon_height">{{ $pokemon->height }}</div></li>
-            <li class="col-6 d-flex gap-2" ><strong>Peso:</strong> <div id="pokemon_weight">{{ $pokemon->weight }}</div></li>
             <li class="col-6 d-flex gap-2" ><strong>Tipo primario:</strong> <div id="pokemon_primary_type">{{ $pokemon->primaryType?->name }}</div></li>
             <li class="col-6 d-flex gap-2" ><strong>Tipo secundario:</strong> <div id="pokemon_secondary_type">{{ $pokemon->secondaryType ? $pokemon->secondaryType->name : 'Ninguno' }}</div></li>
             <li class="col-6 d-flex gap-2" ><strong>Generación:</strong> <div id="pokemon_region">{{ $pokemon->generation?->name }}</div></li>
             <li class="col-6 d-flex gap-2" ><strong>Color:</strong> <div id="pokemon_color">{{ ucfirst($pokemon->color) }}</div></li>
+            <li class="col-6 d-flex gap-2" ><strong>Peso:</strong> <div id="pokemon_weight">{{ $pokemon->weight }}</div></li>
+            <li class="col-6 d-flex gap-2" ><strong>Altura:</strong> <div id="pokemon_height">{{ $pokemon->height }}</div></li>
         </ul>
     </div>
 
@@ -43,12 +43,13 @@
     <div id="pokemon-list-container" class="mb-4" style="display: none;">
         <div id="pokemon-list-header" class="pokemon-label-row table-header d-flex justify-content-around align-items-center mb-3">
             <div class="text-center">Pokémon</div>
-            <div class="text-center">Peso</div>
-            <div class="text-center">Altura</div>
+            
             <div class="text-center">Tipo primario</div>
             <div class="text-center">Tipo secundario</div>
             <div class="text-center">Región</div>
             <div class="text-center">Color</div>
+            <div class="text-center">Altura</div>
+            <div class="text-center">Peso</div>
         </div>
     </div>
 
@@ -293,12 +294,12 @@ div.disabled{
     }
 
     const pokemon_data = {
-            height: document.getElementById('pokemon_height').innerText,
-            weight: document.getElementById('pokemon_weight').innerText,
             primary_type: listaTiposPokemonEspanol[document.getElementById('pokemon_primary_type').innerText],
             secondary_type: ( listaTiposPokemonEspanol[document.getElementById('pokemon_secondary_type').innerText] ? listaTiposPokemonEspanol[document.getElementById('pokemon_secondary_type').innerText] :  'Ninguno'),
             region: document.getElementById('pokemon_region').innerText,
             color: document.getElementById('pokemon_color').innerText,
+            height: (document.getElementById('pokemon_height').innerText / 10) + ' m',
+            weight: (document.getElementById('pokemon_weight').innerText / 10) + ' kg',
         }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -363,16 +364,26 @@ div.disabled{
 
                 // Resto de los atributos, invisibles por ahora
                 const divs = [
-                    crearDivInvisible(p.height , 'height'),
-                    crearDivInvisible(p.weight, 'weight'),
                     crearDivInvisible(listaTiposPokemonEspanol[p.primary_type.name], 'primary_type'),
                     crearDivInvisible(p.secondary_type ? listaTiposPokemonEspanol[p.secondary_type.name] : 'Ninguno', 'secondary_type'),
                     crearDivInvisible(p.generation.name, 'region'),
                     crearDivInvisible(capitalize(p.color), 'color'),
+                    crearDivInvisible((p.height / 10) + ' m' , 'height'),
+                    crearDivInvisible((p.weight / 10) + ' kg', 'weight'),
                 ];
 
+                // divs.forEach(div => newLi.appendChild(div));
+                // pokemonListContainer.appendChild(newLi);
+
                 divs.forEach(div => newLi.appendChild(div));
-                pokemonListContainer.appendChild(newLi);
+                // Si hay una fila de encabezado, insertar después de ella
+                const header = document.getElementById('pokemon-list-header');
+                if (header && header.parentNode) {
+                    header.parentNode.insertBefore(newLi, header.nextSibling);
+                } else {
+                    // Si no hay header, insertar al principio
+                    pokemonListContainer.insertBefore(newLi, pokemonListContainer.firstChild);
+                }
 
                 // cambiar display de pokemonListContainer a block
                 pokemonListContainer.style.display = 'block';
