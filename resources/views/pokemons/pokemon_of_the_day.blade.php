@@ -5,7 +5,7 @@
     <h1 class="mb-4">Pokémon del Día</h1>
 
     <!-- Mostrar el Pokémon aleatorio -->
-    <div class="mb-4 p-2 shadow-sm  d-flex align-items-center gap-5 justify-content-around border rounded" style="width:">
+    <div id="pokemon-card" class="d-none mb-4 p-2 shadow-sm  d-flex align-items-center gap-5 justify-content-around border rounded" style="width:">
         <div class="mr-4" style="text-align: center;">
             <h3 class="card-title">🌟 {{ ucfirst($pokemon->name) }}</h3>
             @if ($pokemon->sprite)
@@ -242,18 +242,34 @@ img.disabled {
   pointer-events: none;    /* no se puede clickear */
 }
 
+div.disabled{
+  opacity: 0.6;           /* lo hace más gris */
+  pointer-events: none;    /* evita clics o interacción */
+  cursor: not-allowed;     /* muestra el cursor de prohibido */
+  filter: grayscale(80%);  /* opcional: más efecto apagado */
+}
+
+.field-label{
+    margin-top: auto;     /* 🔑 empuja la barra al fondo */
+    background-color: black;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    padding: 6px 0;
+    width: 100%;
+}
+
+
 </style>
 
 <script>
-    const pokemonList = @json($pokemon_list);
-
-    const input = document.getElementById('pokemon-search');
-    const results = document.getElementById('autocomplete-results');
-    const pokemonListContainer = document.getElementById('pokemon-list-container');
-
-    const assetBase = "{{ asset('types') }}";
-    const assetRegionBase = "{{ asset('regions') }}";
-
+    
+    const pokemonList = @json($pokemon_list); // Json con listado de los Pokemon
+    const input = document.getElementById('pokemon-search'); // Input del buscador de Pokemon
+    const results = document.getElementById('autocomplete-results'); // Contenedor de resultados de autocompletado
+    const pokemonListContainer = document.getElementById('pokemon-list-container'); // Contenedor de la lista de Pokemon que se han escogido
+    const assetBase = "{{ asset('types') }}"; // Base de assets para los tipos de Pokemon
+    const assetRegionBase = "{{ asset('regions') }}"; // Base de assets para las regiones de Pokemon
 
     const listaTiposPokemonEspanol = {
         normal: 'Normal',
@@ -276,7 +292,6 @@ img.disabled {
         fairy: 'Hada'
     }
 
-    console.log('El tipo secondario es:', !listaTiposPokemonEspanol[document.getElementById('pokemon_secondary_type').innerText]);
     const pokemon_data = {
             height: document.getElementById('pokemon_height').innerText,
             weight: document.getElementById('pokemon_weight').innerText,
@@ -285,7 +300,6 @@ img.disabled {
             region: document.getElementById('pokemon_region').innerText,
             color: document.getElementById('pokemon_color').innerText,
         }
-    console.log('La data de Pokémon es:', pokemon_data);
 
     document.addEventListener('DOMContentLoaded', () => {
         const tipoDiv = document.getElementById('pokemon_primary_type');
@@ -317,8 +331,6 @@ img.disabled {
             `;
 
             li.addEventListener('click', async () => {
-                console.log(p);
-
                 
                 // Limpiar input y resultados
                 results.innerHTML = '';
@@ -326,51 +338,6 @@ img.disabled {
 
                 const newLi = document.createElement('div');
                 newLi.className = "pokemon-row mb-1 py-2 d-flex justify-content-around align-items-center";
-
-                // Función para crear un div invisible
-                const crearDivInvisible = (contenido, tipo) => {
-                    console.log('El tipo es:', pokemon_data[tipo], 'el tipo solo es: ', tipo ,' y el contenido es:', contenido);
-                    const div = document.createElement('div');
-                    div.textContent = contenido;
-                    div.style.opacity = '0';
-                    div.style.visibility = 'hidden';
-                    div.style.transition = 'opacity 0.5s ease';
-                    // div.innerHTML = '<img src="{{ asset('types/normal.svg') }}" alt="Normal Type" style="max-width: 100%; max-height: 100%;">';
-                    if (pokemon_data[tipo] == contenido){
-                        console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
-                        div.style.backgroundColor = clue_colors.success;
-                    } else {
-                        console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
-                        div.style.backgroundColor = clue_colors.error;
-                    }
-
-                    if(tipo == 'primary_type' || tipo == 'secondary_type'){
-                        var clave = Object.keys(listaTiposPokemonEspanol).find(
-                            key => listaTiposPokemonEspanol[key] === contenido
-                        );
-                        console.log('El tipo EEEES:', contenido);
-                        div.style.overflow = 'hidden';
-                        div.style.display = 'flex';
-                        div.style.flexDirection = 'column';
-                        div.innerHTML = `
-                            <img src="${assetBase}/${clave}.svg" alt="Tipo ${clave}" class="${clave} my-auto" style="max-width: 66%; max-height: 66%; padding: 15px; border-radius: 50%;">
-                            <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; ">${contenido}</div>
-                        `;
-
-                    }
-
-                    if (tipo == 'region'){
-                    div.style.overflow = 'hidden';
-                        div.style.display = 'flex';
-                        div.style.flexDirection = 'column';
-                        div.innerHTML = `
-                            <img src="${assetRegionBase}/${contenido}.jpg" alt="Tipo ${clave}" class="${clave} my-auto" style="max-width: 100%; max-height: 100%;">
-                            <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; ">${contenido}</div>
-                        `;
-                        // div.style.lineHeight = '1.5';
-                    }
-                    return div;
-                };
 
                 // Imagen + nombre
                 const nameDiv = document.createElement('div');
@@ -416,18 +383,7 @@ img.disabled {
                 //número con el tamaño de divs
                 const numDivs = divs.length;
                 contador = 0;
-                function hexToRgb(hex) {
-                    // Remueve el "#" si existe
-                    hex = hex.replace(/^#/, '');
 
-                    // Convierte los valores
-                    const bigint = parseInt(hex, 16);
-                    const r = (bigint >> 16) & 255;
-                    const g = (bigint >> 8) & 255;
-                    const b = bigint & 255;
-
-                    return `rgb(${r}, ${g}, ${b})`;
-                }
                 const successRgb = hexToRgb(clue_colors.success);
 
                 for (const div of divs) {
@@ -444,18 +400,75 @@ img.disabled {
                 if (contador === numDivs) {
                     const modal = new bootstrap.Modal(document.getElementById('adivinado'));
                     modal.show();
-                }
-;
+                };
             });
-
             results.appendChild(li);
         });
-
     });
 
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
+
+    function hexToRgb(hex) {
+        hex = hex.replace(/^#/, '');
+
+        // Convierte los valores
+        const bigint = parseInt(hex, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    function crearDivInvisible(contenido, tipo) {
+        console.log('El tipo es:', pokemon_data[tipo], 'el tipo solo es: ', tipo ,' y el contenido es:', contenido);
+        const boxDiv = document.createElement('div');
+        boxDiv.textContent = contenido;
+        boxDiv.style.opacity = '0';
+        boxDiv.style.visibility = 'hidden';
+        boxDiv.style.transition = 'opacity 0.5s ease';
+        if (pokemon_data[tipo] == contenido){
+            console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
+            boxDiv.style.backgroundColor = clue_colors.success;
+        } else {
+            console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
+            // boxDiv.style.backgroundColor = clue_colors.error;
+            boxDiv.classList.add('disabled');
+        }
+
+        if(tipo == 'primary_type' || tipo == 'secondary_type'){
+            var clave = Object.keys(listaTiposPokemonEspanol).find(
+                key => listaTiposPokemonEspanol[key] === contenido
+            );
+            console.log('El tipo EEEES:', contenido);
+            boxDiv.style.overflow = 'hidden';
+            boxDiv.style.display = 'flex';
+            boxDiv.style.flexDirection = 'column';
+            console.log('La clave es:', clave);
+            if(clave !== undefined){
+                console.log('Se entró al div:', contenido);
+                boxDiv.innerHTML = `
+                <img src="${assetBase}/${clave}.svg" alt="Tipo ${clave}" class="${clave} my-auto" style="max-width: 66%; max-height: 66%; padding: 15px; border-radius: 50%;">
+                <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; ">${contenido}</div>
+            `;
+            }
+            
+
+        }
+
+        if (tipo == 'region'){
+        boxDiv.style.overflow = 'hidden';
+            boxDiv.style.display = 'flex';
+            boxDiv.style.flexDirection = 'column';
+            boxDiv.innerHTML = `
+                <img src="${assetRegionBase}/${contenido}.jpg" alt="Tipo ${clave}" class="${clave} my-auto" style="max-width: 100%; max-height: 100%;">
+                <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; ">${contenido}</div>
+            `;
+        }
+        return boxDiv;
+    };
 </script>
 
 
