@@ -293,6 +293,13 @@ div.disabled{
         fairy: 'Hada'
     }
 
+    const clue_colors = {
+        success : '#33EF75',
+        warning : '#ffc107',
+        error   : '#dc3545',
+    }
+
+
     const pokemon_data = {
             primary_type: listaTiposPokemonEspanol[document.getElementById('pokemon_primary_type').innerText],
             secondary_type: ( listaTiposPokemonEspanol[document.getElementById('pokemon_secondary_type').innerText] ? listaTiposPokemonEspanol[document.getElementById('pokemon_secondary_type').innerText] :  'Ninguno'),
@@ -311,10 +318,6 @@ div.disabled{
     });
 
     
-    const clue_colors = {
-        success : '#28a745',
-        error: '#dc3545',
-    }
 
     input.addEventListener('input', function () {
         const term = this.value.toLowerCase();
@@ -440,15 +443,27 @@ div.disabled{
         boxDiv.style.opacity = '0';
         boxDiv.style.visibility = 'hidden';
         boxDiv.style.transition = 'opacity 0.5s ease';
+
+        // Se verifica si el contenido coincide con el del Pokémon del día
         if (pokemon_data[tipo] == contenido){
             console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
             boxDiv.style.backgroundColor = clue_colors.success;
         } else {
-            console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
-            // boxDiv.style.backgroundColor = clue_colors.error;
-            boxDiv.classList.add('disabled');
+            // Solo si es primary_type o secondary_type, poner color de advertencia
+            if(tipo == 'primary_type' || tipo == 'secondary_type'){
+                // Verificar si en este caso, coincide al menos con el otro tipo
+                const otroTipo = (tipo == 'primary_type') ? 'secondary_type' : 'primary_type';
+                if (pokemon_data[otroTipo] == contenido){
+                    console.log('El otro tipo coincide para:', otroTipo, 'con contenido:', contenido);
+                    boxDiv.style.backgroundColor = clue_colors.warning;
+                } else {
+                    // boxDiv.style.backgroundColor = clue_colors.error;
+                }
+                boxDiv.classList.add('disabled');
+            }
         }
 
+        // Si es tipo primario o secundario, añadir imagen del tipo
         if(tipo == 'primary_type' || tipo == 'secondary_type'){
             var clave = Object.keys(listaTiposPokemonEspanol).find(
                 key => listaTiposPokemonEspanol[key] === contenido
@@ -477,6 +492,33 @@ div.disabled{
                 <img src="${assetRegionBase}/${contenido}.jpg" alt="Tipo ${clave}" class="${clave} my-auto" style="width: 100%; height: 79% !important;">
                 <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; height: 21% !important;">${contenido}</div>
             `;
+        }
+
+        if (tipo == 'height' || tipo == 'weight'){
+            // Detectar si el pokemon es mayor o menor que el del día
+            const valorContenido = parseFloat(contenido);
+            const valorPokemonDia = parseFloat(pokemon_data[tipo]);
+            console.log('Comparando valores para Pokemon del día -> ', tipo, ':', valorContenido, 'y Pokemon seleccionado -> ', valorPokemonDia);
+            if (valorContenido < valorPokemonDia) {
+                console.log('El valor es más pequeño:', valorContenido, ' es menor que ', valorPokemonDia);
+                // Más pequeño, añadir una flecha hacia arriba al lado del valor
+                boxDiv.innerHTML = `
+                    <div style="position:relative; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        ${contenido}
+                        <span style="color: ${clue_colors.error}; font-size: 27px; position:absolute; bottom: 30px;">&#8593;</span>
+                    </div>
+                `;
+            } else if (valorContenido > valorPokemonDia) {
+                console.log('El valor es más grande:', valorContenido, ' es mayor que ', valorPokemonDia);
+                // Más grande, añadir una flecha hacia abajo al lado del valor
+                boxDiv.innerHTML = `
+                    <div style="position:relative; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        ${contenido}
+                        <span style="color: ${clue_colors.error}; font-size: 27px; position:absolute; top: 30px;">&#8595;</span>
+                    </div>
+                `;
+            }
+
         }
         return boxDiv;
     };
