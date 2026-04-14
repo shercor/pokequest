@@ -450,11 +450,12 @@ div.disabled{
         boxDiv.style.visibility = 'hidden';
         boxDiv.style.transition = 'opacity 0.5s ease';
 
+        const isMatch = normalize(pokemon_data[tipo]) === normalize(contenido);
+        const state = isMatch ? 'success' : 'error';
+
         // Se verifica si el contenido coincide con el del Pokémon del día
         if (pokemon_data[tipo] == contenido){
-            // console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
             boxDiv.style.backgroundColor = clue_colors.success;
-            // console.log('Se adivinió')
         } else {
             // Solo si es primary_type o secondary_type, poner color de advertencia
             if(tipo == 'primary_type' || tipo == 'secondary_type'){
@@ -471,77 +472,82 @@ div.disabled{
         }
 
         // Si es tipo primario o secundario, añadir imagen del tipo
-        if(tipo == 'primary_type' || tipo == 'secondary_type'){
-            var clave = Object.keys(listaTiposPokemonEspanol).find(
-                key => listaTiposPokemonEspanol[key] === contenido
-            );
-            console.log('El tipo EEEES:', contenido);
-            boxDiv.style.overflow = 'hidden';
-            boxDiv.style.display = 'flex';
-            boxDiv.style.flexDirection = 'column';
-            console.log('La clave es:', clave);
-            if(clave !== undefined){
-                console.log('Se entró al div:', contenido);
-                boxDiv.innerHTML = `
-                <img src="${assetBase}/${clave}.svg" alt="Tipo ${clave}" class="${clave} my-auto" style="max-width: 66%; max-height: 66%; padding: 15px; border-radius: 50%;">
-                <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; height: 21% !important;">${contenido}</div>
-            `;
-            }
-            
-
+        if (tipo === 'primary_type' || tipo === 'secondary_type') {
+            renderType(boxDiv, contenido);
         }
 
-        if (tipo == 'region'){
-            boxDiv.style.overflow = 'hidden';
-            boxDiv.style.display = 'flex';
-            boxDiv.style.flexDirection = 'column';
-
-            const isMatch = normalize(pokemon_data[tipo]) === normalize(contenido);
-
-            if (isMatch) {
-                boxDiv.style.backgroundColor = clue_colors.success;
-            } else {
-                boxDiv.style.backgroundColor = clue_colors.error;
-                boxDiv.classList.add('disabled');
-            }
-
-            boxDiv.innerHTML = `
-                <img src="${assetRegionBase}/${contenido}.jpg" 
-                    style="width: 100%; height: 79%;">
-                <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; height: 21%;">
-                    ${contenido}
-                </div>
-            `;
+        if (tipo === 'region') {
+            renderRegion(boxDiv, contenido, state);
         }
 
         if (tipo == 'height' || tipo == 'weight'){
-            // Detectar si el pokemon es mayor o menor que el del día
-            const valorContenido = parseFloat(contenido);
-            const valorPokemonDia = parseFloat(pokemon_data[tipo]);
-            console.log('Comparando valores para Pokemon del día -> ', tipo, ':', valorContenido, 'y Pokemon seleccionado -> ', valorPokemonDia);
-            if (valorContenido < valorPokemonDia) {
-                console.log('El valor es más pequeño:', valorContenido, ' es menor que ', valorPokemonDia);
-                // Más pequeño, añadir una flecha hacia arriba al lado del valor
-                boxDiv.innerHTML = `
-                    <div style="position:relative; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                        ${contenido}
-                        <span style="color: ${clue_colors.error}; font-size: 27px; position:absolute; bottom: 30px;">&#8593;</span>
-                    </div>
-                `;
-            } else if (valorContenido > valorPokemonDia) {
-                console.log('El valor es más grande:', valorContenido, ' es mayor que ', valorPokemonDia);
-                // Más grande, añadir una flecha hacia abajo al lado del valor
-                boxDiv.innerHTML = `
-                    <div style="position:relative; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                        ${contenido}
-                        <span style="color: ${clue_colors.error}; font-size: 27px; position:absolute; top: 30px;">&#8595;</span>
-                    </div>
-                `;
-            }
-
+            renderHeightWeight(boxDiv, contenido, tipo);
         }
+        
         return boxDiv;
     };
+
+    function renderType(boxDiv, contenido) {
+        const clave = Object.keys(listaTiposPokemonEspanol).find(
+            key => normalize(listaTiposPokemonEspanol[key]) === normalize(contenido)
+        );
+
+        boxDiv.style.overflow = 'hidden';
+        boxDiv.style.display = 'flex';
+        boxDiv.style.flexDirection = 'column';
+
+        if (clave !== undefined) {
+            boxDiv.innerHTML = `
+                <img src="${assetBase}/${clave}.svg"
+                    alt="Tipo ${clave}"
+                    class="${clave} my-auto"
+                    style="max-width:66%; max-height:66%; padding:15px; border-radius:50%;">
+                <div class="field-label">${contenido}</div>
+            `;
+        }
+    }
+
+    function renderRegion(boxDiv, contenido, state) {
+        boxDiv.style.overflow = 'hidden';
+        boxDiv.style.display = 'flex';
+        boxDiv.style.flexDirection = 'column';
+
+        // aplicar estado
+        if (state === 'success') {
+            boxDiv.style.backgroundColor = clue_colors.success;
+        } else {
+            boxDiv.style.backgroundColor = clue_colors.error;
+            boxDiv.classList.add('disabled');
+        }
+
+        boxDiv.innerHTML = `
+            <img src="${assetRegionBase}/${contenido}.jpg" 
+                style="width: 100%; height: 79%; object-fit: cover;">
+            <div class="field-label">
+                ${contenido}
+            </div>
+        `;
+    }
+
+    function renderHeightWeight(boxDiv, contenido, tipo) {
+        const valorContenido = parseFloat(contenido);
+        const valorPokemonDia = parseFloat(pokemon_data[tipo]);
+
+        let arrow = '';
+
+        if (valorContenido < valorPokemonDia) {
+            arrow = `<span style="color:${clue_colors.error}; font-size:27px; position:absolute; bottom:30px;">&#8593;</span>`;
+        } else if (valorContenido > valorPokemonDia) {
+            arrow = `<span style="color:${clue_colors.error}; font-size:27px; position:absolute; top:30px;">&#8595;</span>`;
+        }
+
+        boxDiv.innerHTML = `
+            <div style="position:relative; display:flex; align-items:center; justify-content:center; gap:5px;">
+                ${contenido}
+                ${arrow}
+            </div>
+        `;
+    }
 </script>
 
 
