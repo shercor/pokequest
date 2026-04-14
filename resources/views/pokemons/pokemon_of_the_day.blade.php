@@ -40,7 +40,7 @@
     
 
     <!-- Encabezado tabla -->
-    <div id="pokemon-list-container" class="mb-4" style="display: none;">
+    <div id="pokemon-list-container" class="mb-4" style="display: none; max-height:450px; overflow-y:auto">
         <div id="pokemon-list-header" class="pokemon-label-row table-header d-flex justify-content-around align-items-center mb-3">
             <div class="text-center">Pokémon</div>
             
@@ -436,7 +436,13 @@ div.disabled{
         return `rgb(${r}, ${g}, ${b})`;
     }
 
+    function normalize(str) {
+        return (str || '').toString().trim().toLowerCase();
+    }
+
     function crearDivInvisible(contenido, tipo) {
+        console.log('REGION COMPARE:', `[${pokemon_data[tipo]}]`, `[${contenido}]`);
+
         console.log('El tipo es:', pokemon_data[tipo], 'el tipo solo es: ', tipo ,' y el contenido es:', contenido);
         const boxDiv = document.createElement('div');
         boxDiv.textContent = contenido;
@@ -446,8 +452,9 @@ div.disabled{
 
         // Se verifica si el contenido coincide con el del Pokémon del día
         if (pokemon_data[tipo] == contenido){
-            console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
+            // console.log('El tipo es:', pokemon_data[tipo], 'y el contenido es:', contenido);
             boxDiv.style.backgroundColor = clue_colors.success;
+            // console.log('Se adivinió')
         } else {
             // Solo si es primary_type o secondary_type, poner color de advertencia
             if(tipo == 'primary_type' || tipo == 'secondary_type'){
@@ -485,12 +492,25 @@ div.disabled{
         }
 
         if (tipo == 'region'){
-        boxDiv.style.overflow = 'hidden';
+            boxDiv.style.overflow = 'hidden';
             boxDiv.style.display = 'flex';
             boxDiv.style.flexDirection = 'column';
+
+            const isMatch = normalize(pokemon_data[tipo]) === normalize(contenido);
+
+            if (isMatch) {
+                boxDiv.style.backgroundColor = clue_colors.success;
+            } else {
+                boxDiv.style.backgroundColor = clue_colors.error;
+                boxDiv.classList.add('disabled');
+            }
+
             boxDiv.innerHTML = `
-                <img src="${assetRegionBase}/${contenido}.jpg" alt="Tipo ${clave}" class="${clave} my-auto" style="width: 100%; height: 79% !important;">
-                <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; height: 21% !important;">${contenido}</div>
+                <img src="${assetRegionBase}/${contenido}.jpg" 
+                    style="width: 100%; height: 79%;">
+                <div style="background-color: black; color: white; margin-top: auto; font-size: 18px; width: 100%; height: 21%;">
+                    ${contenido}
+                </div>
             `;
         }
 
